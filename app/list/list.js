@@ -9,71 +9,82 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
   });
 }])
 
-.controller('ListController', ['$uibModal', function($uibModal) {
+.controller('ListController', ['$uibModal', '$http', '$log', function($uibModal, $http, $log) {
     var vm = this;
+    vm.list = [];
+    vm.realized = 0;
+    vm.notRealized = 0;
 
-    vm.list = [
-        {
-            name: "Teste da silva",
-            document: "000.000.001-91",
-            email: "teste@dasilva.com",
-            size: "EG",
-            type: "Primeiro lote",
-            status: "OK",
-            genre: "Masculina"
-        },
-        {
-            name: "Teste da silva",
-            document: "000.000.001-91",
-            email: "teste@dasilva.com",
-            size: "EG",
-            type: "Primeiro lote",
-            status: "OK",
-            genre: "Masculina"
-        },
-        {
-            name: "Teste da silva",
-            document: "058.529.839-42",
-            email: "teste@dasilva.com",
-            size: "EG",
-            type: "Primeiro lote",
-            status: "NÃO REALIZADO",
-            genre: "Feminina"
+    function changeStatus(status) {
+        if (status === 'OK') {
+            return 'NÃO REALIZADO';
         }
-    ];
+        return 'OK';
+    }
 
     vm.confirm = function(list) {
-        if (list.status === 'OK') {
-            $uibModal.open({
-                animation: true,
-                ariaLabelledBy: 'modal-title-undo',
-                ariaDescribedBy: 'modal-body-undo',
-                templateUrl: 'undo.html',
-                size: 'lg',
-                controller: function($scope) {
-                    $scope.selected = list;
-                    $scope.ok = function(id) {
-                        console.log(id);
-                    };
-
-                    $scope.cancel = function() {
-                        this.close();
-                    };
-                }
-            });
-            return;
-        }
-
-        $uibModal.open({
+        var modalInstance = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title-info',
             ariaDescribedBy: 'modal-body-info',
             templateUrl: 'info.html',
             size: 'lg',
-            controller: function($scope) {
-                $scope.selected = list;
+            controller: 'ModalController',
+            controllerAs: 'control',
+            resolve: {
+                list: list
             }
         });
 
+        modalInstance.result.then(function (selectedItem) {
+            selectedItem.status = changeStatus(selectedItem.status);
+            selectedItem.date = new Date();
+            $log.info(selectedItem);
+            $http.put(
+                'http://localhost:3000/participants/' + selectedItem.id,
+                selectedItem,
+                {}
+            ).then(function(result) {
+                $log.info(result);
+                initialize();
+            })
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    };
+
+    initialize();
+
+    function initialize() {
+        $http.get('http://localhost:3000/participants')
+             .then(function(result) {
+                vm.list = result.data;
+                vm.realized = vm.list.filter(function(item) {
+                    return item.status == 'OK';
+                }).length;
+                vm.notRealized = vm.list.length - vm.realized;
+             });
+    };
+}])
+
+.controller('ModalController', ['$uibModalInstance', 'list', function($uibModalInstance, list){
+    var vm = this;
+
+    vm.selected = list;
+
+    vm.getMessage = function () {
+        if (vm.selected.status === 'OK') {
+            return "Confirme os dados para cancelar o CheckIn";
+        }
+
+        return "Confirme os dados para realizar o CheckIn";
+    };
+
+    vm.ok = function() {
+        $uibModalInstance.close(vm.selected);
+    };
+
+    vm.cancel = function() {
+        $uibModalInstance.dismiss('cancel');
     };
 }]);

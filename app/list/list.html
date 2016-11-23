@@ -1,93 +1,73 @@
 <div ng-controller="ListController as control" class="container-fluid">
-    <h1>CheckIn</h1>
-
-    <input type="text"
-        name="name"
-        placeholder="Digite algum dado..."
-        class="input-lg"
-        ng-model="control.search">
-
-    <div class="container-fluid">
-        <table class="table">
-            <thead>
-                <th>Nome</th>
-                <th>CPF</th>
-                <th>Email</th>
-                <th>Tipo do Convite</th>
-                <th>Camiseta</th>
-                <th>Status Checkin</th>
-                <th>#</th>
-            </thead>
-            <tr ng-repeat="list in control.list | filter:control.search">
-                <td>{{list.name}}</td>
-                <td>{{list.document}}</td>
-                <td>{{list.email}}</td>
-                <td>{{list.type}}</td>
-                <td>{{list.size}}</td>
-                <td>
-                    <span ng-class="list.status == 'OK' ? 'glyphicon glyphicon-ok
-    ' : 'glyphicon glyphicon-remove'"></span>
-                    {{list.status}}
-                </td>
-                <td>
-                    <button
-                        ng-click="control.confirm(list)"
-                        ng-class="list.status == 'OK' ? 'btn btn-warning' : 'btn btn-success'">
-                        {{list.status == 'OK' ? 'Cancelar' : 'CheckIn'}}
-                    </button>
-                </td>
-            </tr>
-        </table>
+  <h1>CheckIn</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <input type="text"
+      name="name"
+      placeholder="Digite algum dado..."
+      class="input-lg"
+      ng-model="control.search">
     </div>
+    <div class="col-md-3">Realizados: <span class="badge">{{control.realized}}</span></div>
+    <div class="col-md-3">Restante: <span class="badge">{{control.notRealized}}</span></div>
+  </div>
+  <div class="container-fluid">
+    <table class="table">
+      <thead>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Email</th>
+        <th>Tipo do Convite</th>
+        <th>Camiseta</th>
+        <th>Status Checkin</th>
+        <th>#</th>
+      </thead>
+      <tr ng-repeat="list in control.list | filter:control.search">
+        <td>{{list.name}}</td>
+        <td>{{list.document}}</td>
+        <td>{{list.email}}</td>
+        <td>{{list.type}}</td>
+        <td>{{list.size}}</td>
+        <td>
+          <span ng-class="list.status == 'OK' ? 'glyphicon glyphicon-ok
+          ' : 'glyphicon glyphicon-remove'"></span>
+          {{list.status}}
+        </td>
+        <td>
+          <button
+          ng-click="control.confirm(list)"
+          ng-class="list.status == 'OK' ? 'btn btn-warning' : 'btn btn-success'">
+          {{list.status == 'OK' ? 'Cancelar' : 'CheckIn'}}
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
-
 <script type="text/ng-template" id="info.html">
-    <div class="modal-header">
-        <h3 class="modal-title" id="modal-title-info">Confirme os dados!</h3>
-    </div>
-    <div class="modal-body" id="modal-body-info">
-        <dl class="dl-horizontal">
-            <dt>Nome</dt>
-            <dd>{{selected.name}}</dd>
-            <dt>Documento</dt>
-            <dd>{{selected.document}}</dd>
-            <dt>Email</dt>
-            <dd>{{selected.email}}</dd>
-            <dt>Tipo do convite</dt>
-            <dd>{{selected.type}}</dd>
-            <dt>Camiseta</dt>
-            <dd>{{selected.size}}</dd>
-            <dt>Tipo de Camiseta</dt>
-            <dd>{{selected.genre}}</dd>
-        </dl>
-    </div>
-    <div class="modal-footer">
-                <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-                <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-            </div>
-    </script>
-
-<script type="text/ng-template" id="undo.html">
-    <div class="modal-header">
-        <h3 class="modal-title" id="modal-title-undo">Confirme os dados!</h3>
-    </div>
-    <div class="modal-body" id="modal-body-undo">
-        <p>Você deseja cancelar esse CheckIn?</p>
-        <dl class="dl-horizontal">
-            <dt>Nome</dt>
-            <dd>{{selected.name}}</dd>
-            <dt>Documento</dt>
-            <dd>{{selected.document}}</dd>
-            <dt>Email</dt>
-            <dd>{{selected.email}}</dd>
-            <dt>Tipo do convite</dt>
-            <dd>{{selected.type}}</dd>
-            <dt>Camiseta</dt>
-            <dd>{{selected.size}}</dd>
-            <dt>Tipo de camiseta</dt>
-            <dd>{{selected.genre}}</dd>
-            <dt>Data do CheckIn</dt>
-            <dd>{{<selected class="checkin"></selected>}}</dd>
-        </dl>
-    </div>
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title-info">{{control.getMessage()}}</h3>
+</div>
+<div class="modal-body" id="modal-body-info">
+  <dl class="dl-horizontal">
+    <dt>Nome</dt>
+    <dd>{{control.selected.name}}</dd>
+    <dt>Documento</dt>
+    <dd>{{control.selected.document}}</dd>
+    <dt>Email</dt>
+    <dd>{{control.selected.email}}</dd>
+    <dt>Tipo do convite</dt>
+    <dd>{{control.selected.type}}</dd>
+    <dt>Camiseta</dt>
+    <dd>{{control.selected.size}}</dd>
+    <dt>Tipo de Camiseta</dt>
+    <dd>{{control.selected.genre}}</dd>
+    <dt ng-if="control.selected.date">Horário do Checkin</dt>
+    <dd ng-if="control.selected.date">{{control.selected.date | date:"dd/MM/yyyy HH:mm:ss"}}</dd>
+  </dl>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="control.ok()">OK</button>
+  <button class="btn btn-warning" type="button" ng-click="control.cancel()">Cancel</button>
+</div>
 </script>
