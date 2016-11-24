@@ -64,6 +64,7 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
                 }).length;
                 vm.notRealized = vm.list.length - vm.realized;
              });
+        setTimeout(initialize, 5000);
     };
 }])
 
