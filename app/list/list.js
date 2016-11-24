@@ -45,16 +45,17 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
         selectedItem, {}
       ).then(function(result) {
         $log.info(result);
-        initialize();
+        update();
       });
     }, function() {
       $log.info('modal-component dismissed at: ' + new Date());
     });
   };
 
-  initialize();
+  update();
+  setInterval(update, 10000);
 
-  function initialize() {
+  function update() {
     $http.get('http://localhost:3000/participants')
       .then(function(result) {
         vm.list = result.data;
