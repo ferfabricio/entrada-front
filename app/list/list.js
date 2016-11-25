@@ -10,6 +10,7 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
 }])
 
 .controller('ListController', ['$uibModal', '$http', '$log', function($uibModal, $http, $log) {
+  var URL = "http://192.168.25.100:3000";
   var vm = this;
   vm.list = [];
   vm.realized = 0;
@@ -41,7 +42,7 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
       selectedItem.date = new Date();
       $log.info(selectedItem);
       $http.put(
-        'http://localhost:3000/participants/' + selectedItem.id,
+        URL + '/participants/' + selectedItem.id,
         selectedItem, {}
       ).then(function(result) {
         $log.info(result);
@@ -56,7 +57,7 @@ angular.module('devApp.list', ['ngRoute', 'ui.bootstrap'])
   setInterval(update, 10000);
 
   function update() {
-    $http.get('http://localhost:3000/participants')
+    $http.get(URL + '/participants')
       .then(function(result) {
         vm.list = result.data;
         vm.realized = vm.list.filter(function(item) {
